@@ -1,8 +1,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+
 import './index.css';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBvh-dmXjQpTFNYZ0QulK-3gztiAFNdaKY",
+  authDomain: "lets-reveal.firebaseapp.com",
+  projectId: "lets-reveal",
+  storageBucket: "lets-reveal.appspot.com",
+  messagingSenderId: "1086600794508",
+  appId: "1:1086600794508:web:a387b46d33f6c1e16a46a9",
+  measurementId: "G-336BRZB4C4"
+};
+
+const app = initializeApp(firebaseConfig);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const analytics = getAnalytics(app);
 
 ReactDOM.render(
   <React.StrictMode>
@@ -10,8 +26,3 @@ ReactDOM.render(
   </React.StrictMode>,
   document.getElementById('root')
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
