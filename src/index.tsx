@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import { ThemeProvider } from 'emotion-theming'
+import theme from '@rebass/preset'
 
 import './index.css';
 import App from './App';
@@ -22,7 +24,9 @@ const analytics = getAnalytics(app);
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <ThemeProvider theme={theme}>
+      <App />
+    </ThemeProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );
