@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { RecoilRoot } from 'recoil';
 import { ThemeProvider } from 'styled-components'
 import preset from '@rebass/preset';
 import './index.css';
@@ -12,7 +13,9 @@ const theme = {
 ReactDOM.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
-      <App />
+      <RecoilRoot>
+        <App />
+      </RecoilRoot>
     </ThemeProvider>
   </React.StrictMode>,
   document.getElementById('root')

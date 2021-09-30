@@ -1,34 +1,36 @@
-import { FormEvent, useState } from 'react';
+import { SyntheticEvent, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { Box, Text, Button } from 'rebass/styled-components';
 import { Label, Input, Textarea } from '@rebass/forms';
 import Swal from 'sweetalert2'
 import { ref, uploadBytes } from "firebase/storage";
 import { doc, setDoc } from "firebase/firestore"; 
-import Dropzone from 'react-dropzone-uploader'
-import 'react-dropzone-uploader/dist/styles.css'
+import Dropzone, { IFileWithMeta } from 'react-dropzone-uploader'
+import shortUUID from 'short-uuid';
 import { db, storage } from '../firebase';
 import { shuffle } from '../utils/shuffler';
-import shortUUID from 'short-uuid';
+import { isSquare } from '../utils/isSquare';
 
-interface Props {
-  setCurrentView: (view: string) => void;
-}
+import 'react-dropzone-uploader/dist/styles.css'
 
-const Create = ({setCurrentView}: Props) => {
-  const [file, setFile] = useState(null)
+const Create = () => {
+  const history = useHistory();
+  const [file, setFile] = useState<File>();
 
-  const handleChangeStatus = (file: any) => {
+  const handleChangeStatus = (file: IFileWithMeta) => {
     setFile(file.file);
   };
 
-  const handleCreate = async (e: FormEvent) => {
+  const handleCreate = async (e: SyntheticEvent) => {
     e.preventDefault();
-    //@ts-ignore
-    const roomName = e.target.roomName.value;
-    //@ts-ignore
-    const answersArray = e.target.answers.value?.split(',')?.map(x => x?.trim());
+    const target = e.target as typeof e.target & {
+      roomName: { value: string };
+      answers: { value: string };
+    };
 
-    //@ts-ignore
+    const roomName = target.roomName.value;
+    const answersArray= target.answers.value.split(',').map(x => x.trim());
+
     if (!file) {
       Swal.fire({
         title: 'Error!',
@@ -39,15 +41,21 @@ const Create = ({setCurrentView}: Props) => {
       return;
     }
 
+    if (!isSquare(answersArray.length)) {
+      Swal.fire({
+        title: 'Error!',
+        text: 'The amount of answers entered must be a square number!',
+        icon: 'error',
+        confirmButtonText: 'Ok'
+      })
+      return;
+    }
+
     // Upload Image
     let imgUrl;
     try {
-      
-      //@ts-ignore
       const storageRef = ref(storage, `images/${file.name}`);
-      //@ts-ignore
       const response = await uploadBytes(storageRef, file);
-      //@ts-ignore
       imgUrl = response.metadata.fullPath
     } catch (err) {
       console.error(err);
@@ -59,6 +67,7 @@ const Create = ({setCurrentView}: Props) => {
       })
       return;
     }
+
     //Create doc
     try {
       const roomCode = shortUUID.generate();
@@ -80,9 +89,9 @@ const Create = ({setCurrentView}: Props) => {
         text: `Your Room Code is: ${roomCode}`,
         icon: 'success',
         confirmButtonText: 'Ok'
-      })
+      });
 
-      setCurrentView('init');
+      history.push('/');
       
     } catch(err) {
       console.error(err);
@@ -91,10 +100,10 @@ const Create = ({setCurrentView}: Props) => {
         text: 'There was an unexpected error. Please try again',
         icon: 'error',
         confirmButtonText: 'Ok'
-      })
-      return;
+      });
     }
   }
+
   return (
     <Box as='form' onSubmit={handleCreate}>
       <Label htmlFor='roomName'>Enter room name:</Label>
@@ -108,7 +117,6 @@ const Create = ({setCurrentView}: Props) => {
       />
       <Text my={2}>Upload Image: </Text>
       <Dropzone 
-        // getUploadParams={getUploadParams}
         onChangeStatus={handleChangeStatus}
         maxFiles={1}
         multiple={false}

@@ -1,19 +1,15 @@
 import { Flex } from 'rebass/styled-components';
-import { useState } from 'react';
-import Init from './views/init';
-import Create from './views/create';
-import Room from './views/room';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect
+} from 'react-router-dom';
+import Init from './Pages/Init';
+import Create from './Pages/Create';
+import {Room} from './Pages/Room';
 
 const App = () => {
-  const [currentView, setCurrentView] = useState<string>('init');
-  const [activeRoomCode, setActiveRoomCode] = useState<string>('');
-  const [activeParticipant, setActiveParticipant] = useState<string>('');
-
-  const views = {
-    init: <Init setCurrentView={setCurrentView} setActiveRoomCode={setActiveRoomCode} setActiveParticipant={setActiveParticipant}/>,
-    create: <Create setCurrentView={setCurrentView}/>,
-    room: <Room setCurrentView={setCurrentView} activeRoomCode={activeRoomCode} activeParticipant={activeParticipant}/>,
-  }
 
   return (
     <Flex
@@ -23,8 +19,20 @@ const App = () => {
         justifyContent: 'center',
       }}
     >
-     {/* @ts-ignore */}
-      {views[currentView]}
+      <Router>
+        <Switch>
+          <Route exact path="/">
+            <Init />
+          </Route>
+          <Route path="/create">
+            <Create />
+          </Route>
+          <Route path="/room">
+            <Room />
+          </Route>
+          <Redirect to="/" />
+        </Switch>
+      </Router>
     </Flex>
   );
 }
